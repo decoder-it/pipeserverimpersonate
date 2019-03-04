@@ -95,18 +95,18 @@ function Local:Get-DelegateType
 
     $Win32Constants = New-Object PSObject -Property $Constants
 	
-	$Domain = [AppDomain]::CurrentDomain
-	$DynamicAssembly = New-Object System.Reflection.AssemblyName('DynamicAssembly')
-	$AssemblyBuilder = $Domain.DefineDynamicAssembly($DynamicAssembly, [System.Reflection.Emit.AssemblyBuilderAccess]::Run)
-	$ModuleBuilder = $AssemblyBuilder.DefineDynamicModule('DynamicModule', $false)
-	$ConstructorInfo = [System.Runtime.InteropServices.MarshalAsAttribute].GetConstructors()[0]
+    $Domain = [AppDomain]::CurrentDomain
+    $DynamicAssembly = New-Object System.Reflection.AssemblyName('DynamicAssembly')
+    $AssemblyBuilder = $Domain.DefineDynamicAssembly($DynamicAssembly, [System.Reflection.Emit.AssemblyBuilderAccess]::Run)
+    $ModuleBuilder = $AssemblyBuilder.DefineDynamicModule('DynamicModule', $false)
+    $ConstructorInfo = [System.Runtime.InteropServices.MarshalAsAttribute].GetConstructors()[0]
 
 
   #Struct STARTUPINFO
   $Attributes = 'AutoLayout, AnsiClass, Class, Public, SequentialLayout, Sealed, BeforeFieldInit'
-	$TypeBuilder = $ModuleBuilder.DefineType('STARTUPINFO', $Attributes, [System.ValueType])
-	$TypeBuilder.DefineField('cb', [UInt32], 'Public') | Out-Null
-	$TypeBuilder.DefineField('lpReserved', [IntPtr], 'Public') | Out-Null
+  $TypeBuilder = $ModuleBuilder.DefineType('STARTUPINFO', $Attributes, [System.ValueType])
+  $TypeBuilder.DefineField('cb', [UInt32], 'Public') | Out-Null
+  $TypeBuilder.DefineField('lpReserved', [IntPtr], 'Public') | Out-Null
   $TypeBuilder.DefineField('lpDesktop', [IntPtr], 'Public') | Out-Null
   $TypeBuilder.DefineField('lpTitle', [IntPtr], 'Public') | Out-Null
   $TypeBuilder.DefineField('dwX', [UInt32], 'Public') | Out-Null
@@ -127,38 +127,38 @@ function Local:Get-DelegateType
 
   #Struct PROCESS_INFORMATION
   $Attributes = 'AutoLayout, AnsiClass, Class, Public, SequentialLayout, Sealed, BeforeFieldInit'
-	$TypeBuilder = $ModuleBuilder.DefineType('PROCESS_INFORMATION', $Attributes, [System.ValueType])
-	$TypeBuilder.DefineField('hProcess', [IntPtr], 'Public') | Out-Null
-	$TypeBuilder.DefineField('hThread', [IntPtr], 'Public') | Out-Null
+  $TypeBuilder = $ModuleBuilder.DefineType('PROCESS_INFORMATION', $Attributes, [System.ValueType])
+  $TypeBuilder.DefineField('hProcess', [IntPtr], 'Public') | Out-Null
+  $TypeBuilder.DefineField('hThread', [IntPtr], 'Public') | Out-Null
   $TypeBuilder.DefineField('dwProcessId', [UInt32], 'Public') | Out-Null
   $TypeBuilder.DefineField('dwThreadId', [UInt32], 'Public') | Out-Null
-	$PROCESS_INFORMATION = $TypeBuilder.CreateType()
+ $PROCESS_INFORMATION = $TypeBuilder.CreateType()
 
     
   #API's
 
   
-	$OpenThreadAddr = Get-ProcAddress kernel32.dll OpenThread
-	$OpenThreadDelegate = Get-DelegateType @([UInt32], [Bool], [UInt32]) ([IntPtr])
-	$OpenThread = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($OpenThreadAddr, $OpenThreadDelegate)
+  $OpenThreadAddr = Get-ProcAddress kernel32.dll OpenThread
+  $OpenThreadDelegate = Get-DelegateType @([UInt32], [Bool], [UInt32]) ([IntPtr])
+  $OpenThread = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($OpenThreadAddr, $OpenThreadDelegate)
     
    $OpenThreadTokenAddr = Get-ProcAddress advapi32.dll OpenThreadToken
-	$OpenThreadTokenDelegate = Get-DelegateType @([IntPtr], [UInt32], [Bool], [IntPtr].MakeByRefType()) ([Bool])
-	$OpenThreadToken = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($OpenThreadTokenAddr, $OpenThreadTokenDelegate)
+   $OpenThreadTokenDelegate = Get-DelegateType @([IntPtr], [UInt32], [Bool], [IntPtr].MakeByRefType()) ([Bool])
+   $OpenThreadToken = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($OpenThreadTokenAddr, $OpenThreadTokenDelegate)
 	
-	$CreateProcessWithTokenWAddr = Get-ProcAddress advapi32.dll CreateProcessWithTokenW
-	$CreateProcessWithTokenWDelegate = Get-DelegateType @([IntPtr], [UInt32], [IntPtr], [IntPtr], [UInt32], [IntPtr], [IntPtr], [IntPtr], [IntPtr]) ([Bool])
-	$CreateProcessWithTokenW = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($CreateProcessWithTokenWAddr, $CreateProcessWithTokenWDelegate)
+   $CreateProcessWithTokenWAddr = Get-ProcAddress advapi32.dll CreateProcessWithTokenW
+   $CreateProcessWithTokenWDelegate = Get-DelegateType @([IntPtr], [UInt32], [IntPtr], [IntPtr], [UInt32], [IntPtr], [IntPtr], [IntPtr], [IntPtr]) ([Bool])
+   $CreateProcessWithTokenW = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($CreateProcessWithTokenWAddr, $CreateProcessWithTokenWDelegate)
 	
-	$GetCurrentThreadAddr = Get-ProcAddress kernel32.dll GetCurrentThread
-  $GetCurrentThreadDelegate = Get-DelegateType @() ([IntPtr])
-  $GetCurrentThread = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($GetCurrentThreadAddr, $GetCurrentThreadDelegate)
+   $GetCurrentThreadAddr = Get-ProcAddress kernel32.dll GetCurrentThread
+   $GetCurrentThreadDelegate = Get-DelegateType @() ([IntPtr])
+   $GetCurrentThread = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($GetCurrentThreadAddr, $GetCurrentThreadDelegate)
 	
-	$memsetAddr = Get-ProcAddress msvcrt.dll memset
-	$memsetDelegate = Get-DelegateType @([IntPtr], [Int32], [IntPtr]) ([IntPtr])
-	$memset = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($memsetAddr, $memsetDelegate)
+  $memsetAddr = Get-ProcAddress msvcrt.dll memset
+  $memsetDelegate = Get-DelegateType @([IntPtr], [Int32], [IntPtr]) ([IntPtr])
+  $memset = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($memsetAddr, $memsetDelegate)
 	
-	$DuplicateTokenExAddr = Get-ProcAddress advapi32.dll DuplicateTokenEx
+  $DuplicateTokenExAddr = Get-ProcAddress advapi32.dll DuplicateTokenEx
   $DuplicateTokenExDelegate = Get-DelegateType @([IntPtr], [UInt32], [IntPtr], [UInt32], [UInt32], [IntPtr].MakeByRefType()) ([Bool])
   $DuplicateTokenEx = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($DuplicateTokenExAddr, $DuplicateTokenExDelegate)
 
