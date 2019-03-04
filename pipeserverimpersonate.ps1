@@ -1,5 +1,5 @@
 ### named pipe server with impersonation (neeeds seimpersonateprivilege) ###
-### parts of code from various sources   ###
+### parts of code from various sources  ###
 
 function Local:Get-DelegateType
     {
@@ -195,7 +195,7 @@ $pipe.close()
 $StartupInfoSize = [System.Runtime.InteropServices.Marshal]::SizeOf([Type]$STARTUPINFO)
 [IntPtr]$StartupInfoPtr = [System.Runtime.InteropServices.Marshal]::AllocHGlobal($StartupInfoSize)
 $memset.Invoke($StartupInfoPtr, 0, $StartupInfoSize) | Out-Null
-[System.Runtime.InteropServices.Marshal]::WriteInt32($StartupInfoPtr, $StartupInfoSize) #The first parameter (cb) is a DWORD which is the size of the struct
+[System.Runtime.InteropServices.Marshal]::WriteInt32($StartupInfoPtr, $StartupInfoSize) 
 $ProcessInfoSize = [System.Runtime.InteropServices.Marshal]::SizeOf([Type]$PROCESS_INFORMATION)
 [IntPtr]$ProcessInfoPtr = [System.Runtime.InteropServices.Marshal]::AllocHGlobal($ProcessInfoSize)
 $memset.Invoke($ProcessInfoPtr, 0, $ProcessInfoSize) | Out-Null
