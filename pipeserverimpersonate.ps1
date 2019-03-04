@@ -47,9 +47,9 @@ function Local:Get-DelegateType
         $UnsafeNativeMethods = $SystemAssembly.GetType('Microsoft.Win32.UnsafeNativeMethods')
         $GetModuleHandle = $UnsafeNativeMethods.GetMethod('GetModuleHandle')
         #not working on win >=10 
-		#$GetProcAddress = $UnsafeNativeMethods.GetMethod('GetProcAddress')
-		$GetProcAddress = $UnsafeNativeMethods.GetMethod('GetProcAddress', [reflection.bindingflags] "Public,Static", $null, [System.Reflection.CallingConventions]::Any, @((New-Object System.Runtime.InteropServices.HandleRef).GetType(), [string]), $null);
-		$Kern32Handle = $GetModuleHandle.Invoke($null, @($Module))
+	#$GetProcAddress = $UnsafeNativeMethods.GetMethod('GetProcAddress')
+	$GetProcAddress = $UnsafeNativeMethods.GetMethod('GetProcAddress', [reflection.bindingflags] "Public,Static", $null, [System.Reflection.CallingConventions]::Any, @((New-Object System.Runtime.InteropServices.HandleRef).GetType(), [string]), $null);
+	$Kern32Handle = $GetModuleHandle.Invoke($null, @($Module))
         $tmpPtr = New-Object IntPtr
         $HandleRef = New-Object System.Runtime.InteropServices.HandleRef($tmpPtr, $Kern32Handle)
         Write-Output $GetProcAddress.Invoke($null, @([System.Runtime.InteropServices.HandleRef]$HandleRef, $Procedure))
